@@ -35,7 +35,10 @@ async function getData(data) {
   return sheets;
 }
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
+}));
 app.use(express.json());
 
 app.post("/handle", async (req,res) => {
