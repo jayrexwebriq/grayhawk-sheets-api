@@ -34,8 +34,9 @@ async function getData(data) {
   return sheets;
 }
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: 'http://localhost:3000'
+}));
 app.use(express.json());
 
 app.post("/handle", async (req,res) => {
