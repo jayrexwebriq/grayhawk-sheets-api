@@ -37,7 +37,6 @@ app.use(express.json());
 app.use(express.json());
 
 app.post("/handle", async (req,res) => {
-  console.log('req body => ', req);
   const sheets = await getData(req.body);
   return res.status(200).json({
     sheets,
