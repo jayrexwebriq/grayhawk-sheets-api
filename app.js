@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 3001;
 const { GoogleSpreadsheet } = require('google-spreadsheet');
+const cors = require("cors");
 
 const CLIENT_EMAIL = process.env.CLIENT_EMAIL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
@@ -33,6 +34,7 @@ async function getData(data) {
   return sheets;
 }
 
+app.use(cors());
 app.use(express.json());
 app.use(express.json());
 
