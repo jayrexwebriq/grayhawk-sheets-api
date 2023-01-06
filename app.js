@@ -15,7 +15,7 @@ async function getData(data) {
     projectSpreadsheetLink: "https://docs.google.com/spreadsheets/d/1HS3-a1zJu-ioUvT-COMoSBtAV62wuxdGrxJA2gE4V5E/edit#gid=0",
 
   };
-  const doc = new GoogleSpreadsheet(validated.projectSpreadsheetLink.split('/d/')[1].split('/')[0]);
+  const doc = new GoogleSpreadsheet(data.projectSpreadsheetLink.split('/d/')[1].split('/')[0]);
 
   await doc.useServiceAccountAuth({
     client_email: CLIENT_EMAIL,
