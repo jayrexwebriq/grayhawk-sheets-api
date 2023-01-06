@@ -11,28 +11,31 @@ const CLIENT_EMAIL = process.env.CLIENT_EMAIL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 async function getData(data) {
-  const validated = {
-    projectSpreadsheetLink: "https://docs.google.com/spreadsheets/d/1HS3-a1zJu-ioUvT-COMoSBtAV62wuxdGrxJA2gE4V5E/edit#gid=0",
+  try {
+      const doc = new GoogleSpreadsheet(data.projectSpreadsheetLink.split('/d/')[1].split('/')[0]);
 
-  };
-  const doc = new GoogleSpreadsheet(data.projectSpreadsheetLink.split('/d/')[1].split('/')[0]);
+      await doc.useServiceAccountAuth({
+        client_email: CLIENT_EMAIL,
+        private_key: PRIVATE_KEY.replace(/\\n/gm, '\n')
+      });
 
-  await doc.useServiceAccountAuth({
-    client_email: CLIENT_EMAIL,
-    private_key: PRIVATE_KEY.replace(/\\n/gm, '\n')
-  });
+        await doc.loadInfo(); // loads sheets
+        const sheet = doc.sheetsByIndex[data.projectSpreadsheetNumber - 1]; // the first sheet
+        await sheet.loadCells('A1:W45');
+        const sheets = {
+          grantedMiles: sheet.getCellByA1(data.projectSpreadsheetCells.grantedMiles).value,
+          totalMiles: sheet.getCellByA1(data.projectSpreadsheetCells.totalMiles).value,
+          grantedFeet: sheet.getCellByA1(data.projectSpreadsheetCells.grantedFeet).value,
+          totalFeet: sheet.getCellByA1(data.projectSpreadsheetCells.totalFeet).value,
+        };
 
-    await doc.loadInfo(); // loads sheets
-    const sheet = doc.sheetsByIndex[data.projectSpreadsheetNumber - 1]; // the first sheet
-    await sheet.loadCells('A1:W45');
-    const sheets = {
-      grantedMiles: sheet.getCellByA1(data.projectSpreadsheetCells.grantedMiles).value,
-      totalMiles: sheet.getCellByA1(data.projectSpreadsheetCells.totalMiles).value,
-      grantedFeet: sheet.getCellByA1(data.projectSpreadsheetCells.grantedFeet).value,
-      totalFeet: sheet.getCellByA1(data.projectSpreadsheetCells.totalFeet).value,
-    };
+      return sheets;
 
-  return sheets;
+  } catch (error) {
+    console.warn({ error })
+
+    return error;
+  }
 }
 
 app.use(cors({
