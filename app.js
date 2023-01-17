@@ -12,21 +12,32 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 async function getData(data) {
   try {
-      const doc = new GoogleSpreadsheet(data.projectSpreadsheetLink.split('/d/')[1].split('/')[0]);
+        let sheets = {
+          grantedMiles: '-',
+          totalMiles: '-',
+          grantedFeet: '-',
+          totalFeet: '-',
+        };
+        if(!data?.projectSpreadsheetNumber || !data?.projectSpreadsheetLink) {
+          return sheets;
+        }
 
-      await doc.useServiceAccountAuth({
-        client_email: CLIENT_EMAIL,
-        private_key: PRIVATE_KEY.replace(/\\n/gm, '\n')
-      });
+        const doc = new GoogleSpreadsheet(data.projectSpreadsheetLink.split('/d/')[1].split('/')[0]);
+
+        await doc.useServiceAccountAuth({
+          client_email: CLIENT_EMAIL,
+          private_key: PRIVATE_KEY.replace(/\\n/gm, '\n')
+        });
 
         await doc.loadInfo(); // loads sheets
         const sheet = doc.sheetsByIndex[data.projectSpreadsheetNumber - 1]; // the first sheet
         await sheet.loadCells('A1:W45');
-        const sheets = {
-          grantedMiles: sheet.getCellByA1(data.projectSpreadsheetCells.grantedMiles).value,
-          totalMiles: sheet.getCellByA1(data.projectSpreadsheetCells.totalMiles).value,
-          grantedFeet: sheet.getCellByA1(data.projectSpreadsheetCells.grantedFeet).value,
-          totalFeet: sheet.getCellByA1(data.projectSpreadsheetCells.totalFeet).value,
+        const {grantedMiles, totalMiles, grantedFeet, totalFeet} = data.projectSpreadsheetCells;
+        sheets = {
+          grantedMiles: grantedMiles ? sheet.getCellByA1(grantedMiles).value : '-',
+          totalMiles: totalMiles ? sheet.getCellByA1(totalMiles).value : '-',
+          grantedFeet: grantedFeet ? sheet.getCellByA1(grantedFeet).value : '-',
+          totalFeet: totalFeet ? sheet.getCellByA1(totalFeet).value : '-',
         };
 
       return sheets;
